@@ -179,3 +179,10 @@ We’re excited to see how you approach full-stack problems thoughtfully and pra
 —  
 **Ni & the Origin Team**  
 [joinoriginspeech.com](https://joinoriginspeech.com)
+
+---
+
+## ⚠️ Notice
+This repository is for Origin Therapy’s engineering take-home assignment.  
+It’s provided publicly so candidates can easily access the instructions.  
+Please do not submit pull requests or use this repository for other purposes.
