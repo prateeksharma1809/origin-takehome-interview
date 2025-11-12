@@ -1,11 +1,21 @@
 import { prisma } from './db';
-import { SessionWithNames, SessionWithRelations } from '@/types/models';
+import { SessionWithNames } from '@/types/models';
 
 interface GetSessionsParams {
   search?: string;
   status?: string;
   sortOrder?: 'asc' | 'desc';
 }
+
+type SessionWithNameSelections = {
+  id: number;
+  date: Date;
+  status: string | null;
+  therapist_id: number | null;
+  patient_id: number | null;
+  therapists: { name: string } | null;
+  patients: { name: string } | null;
+};
 
 export async function getAllSessionsWithNames(params?: GetSessionsParams): Promise<SessionWithNames[]> {
   const { search, status, sortOrder = 'asc' } = params || {};
@@ -47,7 +57,7 @@ export async function getAllSessionsWithNames(params?: GetSessionsParams): Promi
     };
   }
 
-  const sessions: SessionWithRelations[] = await prisma.sessions.findMany({
+  const sessions: SessionWithNameSelections[] = await prisma.sessions.findMany({
     where: Object.keys(whereClause).length > 0 ? whereClause : undefined,
     orderBy: { date: sortOrder },
     include: {

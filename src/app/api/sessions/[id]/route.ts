@@ -1,13 +1,17 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { updateSessionStatus } from '@/lib/sessionUpdate';
 import { parseNumericId, parseIdFromRequestUrl } from '@/lib/validation';
 
-export type RouteContext = { params: { id: string } };
-
-export async function PATCH(request: Request, context: RouteContext) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> | { id: string } }
+) {
   try {
+    // Resolve params for Next.js 15+/16 where params may be a Promise
+    const resolvedParams = await Promise.resolve(params);
+
     // Robust id parsing from params, then fallback to URL
-    const idFromParams = parseNumericId(context?.params?.id);
+    const idFromParams = parseNumericId(resolvedParams?.id);
     const idFromUrl = parseIdFromRequestUrl(request.url);
     const sessionId = idFromParams ?? idFromUrl;
 
