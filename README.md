@@ -1,188 +1,230 @@
-# 🧠 Origin Take-Home Assignment — Therapist Session Dashboard
-**Stack:** TypeScript · Next.js 13+ (App Router) · REST API · Postgres (Neon) · TailwindCSS  
+<div align="center">
 
----
+# Origin Take‑Home Interview
 
-## ✉️ Overview
-Welcome 👋 — and thanks for taking the time to complete Origin Therapy’s take-home challenge.  
-This exercise mirrors real full-stack work at **Origin**: connecting clean backend APIs to polished, type-safe UIs.
+An end-to-end sample app to manage therapists, patients, and therapy sessions. Built with Next.js App Router, Prisma, TypeScript, and Zod.
 
-You’ll build a small **Therapist Session Dashboard** using **Next.js**, **TypeScript**, and a provided **Neon Postgres** database.
+</div>
 
-This assignment is scoped for about **3–5 hours** of work for someone comfortable with these tools.  
-Feel free to use **AI coding assistants** (Cursor, Copilot, Claude, etc.) — we care most about structure, clarity, and UX judgment.
+## Overview
 
----
+This app exposes public read-only endpoints and pages for browsing therapists, patients, and sessions, and a simple password-gated Admin area for full CRUD. It uses PostgreSQL via Prisma, validates input with Zod, and keeps auth intentionally simple for the scope of a take‑home exercise.
 
-## 🎯 Goal
-Build a small **full-stack web app** where therapists can view and update their upcoming sessions.
+Highlights
+- Next.js 16 App Router with React 19
+- PostgreSQL + Prisma Client
+- Strict input validation (Zod) and consistent API error envelope
+- Minimal session cookie-based admin auth for demo purposes
+- TypeScript end-to-end with light shared types
 
-You’ll:
-1. Connect to a provided **Postgres database** (already seeded with mock data).  
-2. Build a small **REST API** that reads and updates data.  
-3. Create a **Next.js UI** that consumes that API and presents a usable dashboard.  
+## Tech stack
 
----
+- Next.js: 16.0.1 (App Router)
+- React / React DOM: 19.2.0
+- TypeScript: ^5
+- Prisma ORM: ^6.19.0
+- Zod: ^4.1.12
+- Tailwind CSS 4 (via @tailwindcss/postcss)
 
-## 🧱 Database Access
-You’ll receive your personal **Neon connection string** by email.
+## Project structure
 
-Add it to a local `.env.local` file:
-```bash
-DATABASE_URL="postgresql://takehome_user:password@ep-example.neon.tech/neon?branch=takehome-yourname&sslmode=require"
+Key folders and files:
+
+```
+src/
+	app/
+		page.tsx                # Marketing/home page
+		patients/               # Public list + pages
+		therapists/             # Public list + pages
+		admin/                  # Admin dashboard (login + CRUD pages)
+		api/                    # Route handlers (public + admin APIs)
+	components/               # UI components (lists, forms, modal)
+	lib/                      # DB, validation, helpers
+	types/                    # Shared TS interfaces
+prisma/
+	schema.prisma             # Data model (PostgreSQL)
+prisma.config.ts            # Prisma config (migrations, datasource)
+next.config.ts              # Next.js configuration
+package.json                # Scripts and deps
 ```
 
-This connects to your own isolated branch seeded with mock data for:
-- Therapists  
-- Patients  
-- Sessions  
+Full tree (trimmed):
 
-You can safely modify session data (read/write only — no schema changes).
+```
+eslint.config.mjs
+next.config.ts
+package.json
+prisma/
+	schema.prisma
+public/
+src/
+	app/
+		admin/
+			login/page.tsx
+			patients/page.tsx
+			sessions/page.tsx
+			therapists/page.tsx
+		api/
+			admin/
+				login/route.ts
+				logout/route.ts
+				patients/route.ts
+				patients/[id]/route.ts
+				sessions/route.ts
+				sessions/[id]/route.ts
+				therapists/route.ts
+				therapists/[id]/route.ts
+			patients/route.ts
+			sessions/route.ts
+			therapists/route.ts
+		page.tsx
+	components/
+	lib/
+		db.ts
+		adminValidation.ts
+		apiHelpers.ts
+		sessions.ts
+	types/
+		models.ts
+```
 
----
+## Data model
 
-## 🧩 Requirements
+Backed by PostgreSQL. Prisma models (see `prisma/schema.prisma`):
 
-### 1️⃣ Backend (REST API)
-- Connect to the provided **Postgres** database.  
-- Implement at least two endpoints:
-  - `GET /api/sessions` → returns all sessions (joined with therapist + patient names)
-  - `PATCH /api/sessions/:id` → updates a session’s `status` (e.g. “Completed”)
-- Use **TypeScript** throughout.  
-- Handle validation and errors gracefully (`400 / 404 / 500`).  
-- Use either **pg**, **Drizzle**, or **Prisma** for DB access.
+- patients: id, name, dob (Date nullable)
+- therapists: id, name, specialty (nullable)
+- sessions: id, patient_id, therapist_id, date (timestamp), status (defaults to "Scheduled"), relations to patients and therapists with cascade delete
 
----
+## Requirements and setup
 
-### 2️⃣ Frontend (UI)
-- Display sessions in a responsive table or card layout.  
-- Show therapist name, patient name, date/time, and status.  
-- Add a **“Mark Completed”** button calling your PATCH endpoint.  
-- Include **loading**, **error**, and **empty** states.  
-- Style with **TailwindCSS** — clean and readable is perfect.
+Prerequisites
+- Node.js 20+ recommended
+- PostgreSQL 14+ running locally or remote
 
----
+Environment
+1) Create a `.env` file in the project root:
 
-### 3️⃣ Bonus (optional)
-- Add search / filter (e.g. by therapist or status).  
-- Add optimistic UI updates (update the UI immediately on click).  
-- Deploy to [Vercel](https://vercel.com) or [Render](https://render.com).  
+```
+DATABASE_URL="postgresql://<user>:<password>@localhost:5432/<database>?schema=public"
+```
 
----
+2) Install dependencies and generate the Prisma client.
 
-## 🧰 Setup
+Windows PowerShell examples:
 
-### 1. Clone / Install
-```bash
-git clone https://github.com/Origin-Therapy/origin-takehome-interview.git
-cd origin-takehome-interview
+```powershell
 npm install
+npx prisma migrate dev --name init
+npx prisma generate
 ```
 
-### 2. Environment Variables
-Create a `.env.local` file:
-```bash
-DATABASE_URL="your-connection-string"
-```
+3) Start the app in development:
 
-### 3. Run Locally
-```bash
+```powershell
 npm run dev
-# open http://localhost:3000
 ```
 
----
+Open http://localhost:3000
 
-## 🧾 Submission
-When finished, please send:
-1. A link to your **GitHub repo** (public or invite us).  
-2. A short section in your README titled **“Design Choices”** explaining:  
-   - How you approached the problem  
-   - Any trade-offs or assumptions  
-   - What you’d improve with more time  
-3. *(Optional)* A 2–3 minute Loom or screen recording showing your app.
+Build and run production locally:
 
-Email your submission to **ni@joinoriginspeech.com**.
-
----
-
-## 🗓 Timeline
-Please submit within **24 hours** of receiving your database URL.  
-Need more time? No problem — just ask.
-
----
-
-## 🧮 Evaluation Rubric (25 pts)
-
-| Category | Points | What We Look For |
-|-----------|--------|-----------------|
-| Backend Correctness | 5 | Endpoints work; updates persist |
-| Type Safety / Data Modeling | 5 | Clean TypeScript; no `any` |
-| Frontend Implementation | 5 | Functional UI fetching real data |
-| UX & Visual Polish | 4 | Clear loading/error states |
-| Code Structure & Clarity | 4 | Logical, modular organization |
-| Documentation / Reasoning | 2 | README clarity and setup instructions |
-
-✅ *Bonus (+3 pts)* for optimistic UI, caching, or elegant UX touches.
-
----
-
-## 🧱 Database Schema (for reference)
-
-```sql
-CREATE TABLE therapists (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  specialty TEXT
-);
-
-CREATE TABLE patients (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  dob DATE
-);
-
-CREATE TABLE sessions (
-  id SERIAL PRIMARY KEY,
-  therapist_id INT REFERENCES therapists(id),
-  patient_id INT REFERENCES patients(id),
-  date TIMESTAMP NOT NULL,
-  status TEXT CHECK (status IN ('Scheduled','Completed')) DEFAULT 'Scheduled'
-);
+```powershell
+npm run build; npm start
 ```
 
-**Example Row**
+Lint:
 
-| Therapist | Patient | Date | Status |
-|------------|----------|------|--------|
-| Anna SLP | Ariel Underwood | 2025-11-08 09:00 | Scheduled |
+```powershell
+npm run lint
+```
 
----
+## Admin console
 
-## 💬 Questions
-If anything’s unclear or your DB connection fails, email **ni@joinoriginspeech.com** — we’ll help quickly.
+- Login: http://localhost:3000/admin/login
+- Demo credentials: username `admin`, password `@dmIn!`
+- After login, a secure, httpOnly cookie `admin-session=authenticated` gates all admin APIs and pages
+- Logout: POST `/api/admin/logout` or via the UI
 
----
+Note: This is intentionally simple and not production-grade auth (no user table, no hashing, no CSRF/2FA). For a real system, replace with proper identity, sessions or JWTs, and RBAC.
 
-## 📘 Helpful Links
-- [Next.js App Router Docs](https://nextjs.org/docs/app)  
-- [Next.js API Routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes)  
-- [Drizzle ORM Docs](https://orm.drizzle.team/docs/overview)  
-- [TailwindCSS Docs](https://tailwindcss.com/docs)  
-- [Neon Postgres](https://neon.tech/docs/introduction)
+## Public pages
 
----
+- `/patients` – list and filter patients
+- `/therapists` – list and filter therapists
 
-**Good luck — and have fun building!**  
-We’re excited to see how you approach full-stack problems thoughtfully and pragmatically.  
+## Public APIs
 
-—  
-**Ni & the Origin Team**  
-[joinoriginspeech.com](https://joinoriginspeech.com)
+All responses are JSON. Errors return `{ success: false, error: { message, code, details? } }` only on admin routes using the helper; public routes return simple `{ error }` for brevity.
 
----
+- `GET /api/patients?name=<string>`
+	- Returns `[ { id, name, dob } ]` filtered by case-insensitive name contains
 
-## ⚠️ Notice
-This repository is for Origin Therapy’s engineering take-home assignment.  
-It’s provided publicly so candidates can easily access the instructions.  
-Please do not submit pull requests or use this repository for other purposes.
+- `GET /api/therapists?name=<string>&specialty=<string>`
+	- Returns `[ { id, name, specialty } ]`
+
+- `GET /api/sessions?search=<string>&status=<Scheduled|Completed|Cancelled|No-show>&sortOrder=<asc|desc>`
+	- Returns `[ { id, date, status, therapistName, patientName } ]`
+
+## Admin APIs (require cookie `admin-session=authenticated`)
+
+Auth
+- `POST /api/admin/login` body `{ username, password }` → sets session cookie on success
+- `POST /api/admin/logout` → clears the cookie
+
+Patients
+- `GET /api/admin/patients` → list with session summaries
+- `POST /api/admin/patients` body `{ name: string, dob?: ISODateString }`
+- `PUT /api/admin/patients/:id` body `{ name?: string, dob?: ISODateString|null }`
+- `DELETE /api/admin/patients/:id` (blocked if the patient has sessions)
+
+Therapists
+- `GET /api/admin/therapists`
+- `POST /api/admin/therapists` body `{ name: string, specialty?: string }`
+- `PUT /api/admin/therapists/:id` body `{ name?: string, specialty?: string|null }`
+- `DELETE /api/admin/therapists/:id` (blocked if the therapist has sessions)
+
+Sessions
+- `GET /api/admin/sessions`
+- `POST /api/admin/sessions` body `{ patient_id: number, therapist_id: number, date: ISODateString, status?: 'Scheduled'|'Completed'|'Cancelled'|'No-show' }`
+- `PUT /api/admin/sessions/:id` body `{ patient_id?, therapist_id?, date?, status? }`
+- `DELETE /api/admin/sessions/:id`
+
+Validation and errors
+- All admin inputs validated via Zod schemas in `src/lib/adminValidation.ts`
+- Consistent success/error envelope implemented in `src/lib/apiHelpers.ts`
+
+## Design reasoning and trade‑offs
+
+- App Router: Chosen for file-based routing, server components, and co-located API route handlers for small, focused endpoints.
+- Prisma + PostgreSQL: Strong relational consistency, easy migrations, type-safe client.
+- Zod at the edge: Perform strict request validation at route boundaries; fail fast with helpful field errors.
+- Simple cookie auth for admin: Adequate for a take‑home; keeps focus on data/validation/CRUD. In production, replace with robust auth and authorization.
+- Separation of concerns: Public read APIs are decoupled from admin CRUD APIs. UI layers use typed helper functions and lightweight components.
+- Error handling: Centralized helpers normalize error shapes, including Prisma error code mapping.
+- Dates: ISO strings accepted on input; converted to JS `Date` server-side. DB stores `Date`/`Timestamp`. Display formatting is a UI concern.
+
+## Development notes
+
+- Prisma migrations: Run `npx prisma migrate dev` whenever the schema changes. The `prisma.config.ts` points migrations to `prisma/migrations`.
+- Database URL: Required (`DATABASE_URL`); without it the dev server will fail to start or APIs will 500.
+- Images: `next.config.ts` whitelists `cdn.prod.website-files.com` for remote images.
+- Tailwind v4: Configured via PostCSS. No `tailwind.config.js` is needed.
+
+## Troubleshooting
+
+- Dev server fails (Exit code 1): Ensure `.env` exists with a valid `DATABASE_URL`, Postgres is reachable, and run the Prisma steps: `npx prisma migrate dev` then `npx prisma generate`.
+- Prisma client error: Delete `.prisma` cache if needed and regenerate: `npx prisma generate`.
+- Migrations fail: Confirm the target database user has privileges; drop and recreate the database for a clean slate in local dev.
+
+## Scripts
+
+- `npm run dev` – start Next.js in development
+- `npm run build` – production build
+- `npm start` – start production server
+- `npm run lint` – run ESLint
+
+## License
+
+This project is licensed under the terms of the LICENSE file included in the repository.
+
