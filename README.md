@@ -6,6 +6,10 @@ An end-to-end sample app to manage therapists, patients, and therapy sessions. B
 
 </div>
 
+## Live deployment
+
+Hosted on Vercel: https://origin-takehome-interview.vercel.app/
+
 ## Overview
 
 This app exposes public read-only endpoints and pages for browsing therapists, patients, and sessions, and a simple password-gated Admin area for full CRUD. It uses PostgreSQL via Prisma, validates input with Zod, and keeps auth intentionally simple for the scope of a take‑home exercise.
